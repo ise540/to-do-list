@@ -9,7 +9,7 @@ const DB_URL = 'mongodb://localhost:27017/to-do-list';
 const app = express();
 
 app.use(express.json());
-app.use('/api', router)
+app.use('/api', router);
 
 async function start() {
   try {

@@ -14,7 +14,13 @@
   "compilerOptions": {
     // `target` and `lib` match @tsconfig/bases for node12, since that's the oldest node LTS, so it's the oldest node we support
     "target": "es2019",
-    "lib": ["es2019", "es2020.promise", "es2020.bigint", "es2020.string", "dom"],
+    "lib": [
+      "es2019",
+      "es2020.promise",
+      "es2020.bigint",
+      "es2020.string",
+      "dom"
+    ],
     "rootDir": "src",
     "outDir": "dist",
     "module": "commonjs",

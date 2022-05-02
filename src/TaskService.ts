@@ -1,7 +1,8 @@
 import Task from './Task';
+import type TaskObject from './TaskInterface';
 
 class TaskService {
-  async create(task: any) {
+  async create(task: TaskObject) {
     const createdTask = await Task.create(task);
     return createdTask;
   }
@@ -17,7 +18,7 @@ class TaskService {
     return tasks;
   }
 
-  async update(task: any) {
+  async update(task: TaskObject) {
     if (!task._id) throw new Error(`No id provided`);
 
     const updatedTask = await Task.findByIdAndUpdate(task._id, task, {
@@ -33,6 +34,8 @@ class TaskService {
   }
 
   async getPage(page: number) {
+    if (typeof page !== 'number')
+        return { error: 'page must be a number' };
     const pageContent = await Task.find()
       .skip((page - 1) * 5)
       .limit(5);

@@ -1,8 +1,8 @@
-import Task from './Task';
+import type express from 'express';
 import TaskService from './TaskService';
 
 class TaskController {
-  async create(req: any, res: any) {
+  async create(req: express.Request, res: express.Response) {
     try {
       const task = await TaskService.create(req.body);
       res.send(task);
@@ -11,7 +11,7 @@ class TaskController {
     }
   }
 
-  async getOne(req: any, res: any) {
+  async getOne(req: express.Request, res: express.Response) {
     try {
       const { id } = req.params;
       const task = await TaskService.getOne(id);
@@ -21,7 +21,7 @@ class TaskController {
     }
   }
 
-  async getAll(req: any, res: any) {
+  async getAll(req: express.Request, res: express.Response) {
     try {
       const tasks = await TaskService.getAll();
       res.send(tasks);
@@ -30,7 +30,7 @@ class TaskController {
     }
   }
 
-  async update(req: any, res: any) {
+  async update(req: express.Request, res: express.Response) {
     try {
       const task = req.body;
       const updatetask = await TaskService.update(task);
@@ -40,7 +40,7 @@ class TaskController {
     }
   }
 
-  async delete(req: any, res: any) {
+  async delete(req: express.Request, res: express.Response) {
     try {
       const { id } = req.params;
       const deletedTask = await TaskService.delete(id);
@@ -50,9 +50,9 @@ class TaskController {
     }
   }
 
-  async getPage(req: any, res: any) {
+  async getPage(req: express.Request, res: express.Response) {
     try {
-      const page = req.params.page || 1;
+      const page: any = req.params.page;
       const pageContent = await TaskService.getPage(page);
       res.send(pageContent);
     } catch (e) {
@@ -60,7 +60,7 @@ class TaskController {
     }
   }
 
-  async getNext(req: any, res: any) {
+  async getNext(req: express.Request, res: express.Response) {
     try {
       const nextTask = await TaskService.getNext(req.params.id);
       res.send(nextTask);
@@ -69,7 +69,7 @@ class TaskController {
     }
   }
 
-  async getPrevious(req: any, res: any) {
+  async getPrevious(req: express.Request, res: express.Response) {
     try {
       const previousTask = await TaskService.getPrevious(req.params.id);
       res.send(previousTask);
