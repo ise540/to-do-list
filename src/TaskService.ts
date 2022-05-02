@@ -34,8 +34,8 @@ class TaskService {
   }
 
   async getPage(page: number) {
-    if (typeof page !== 'number')
-        return { error: 'page must be a number' };
+    if (isNaN(page) || page<1)
+        return { error: 'page must be a positive number' };
     const pageContent = await Task.find()
       .skip((page - 1) * 5)
       .limit(5);

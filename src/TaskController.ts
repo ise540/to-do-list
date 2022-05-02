@@ -52,7 +52,7 @@ class TaskController {
 
   async getPage(req: express.Request, res: express.Response) {
     try {
-      const page: any = req.params.page;
+      const page: number = +req.params.page;
       const pageContent = await TaskService.getPage(page);
       res.send(pageContent);
     } catch (e) {
