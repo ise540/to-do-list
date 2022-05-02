@@ -1,5 +1,5 @@
 import Task from './Task';
-import type TaskObject from './TaskInterface';
+import type TaskObject from './TaskObjectType';
 
 class TaskService {
   async create(task: TaskObject) {

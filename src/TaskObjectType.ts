@@ -1,4 +1,4 @@
-interface TaskObject {
+type TaskObject =  {
   readonly _id: string;
   number: number;
   title: string;
