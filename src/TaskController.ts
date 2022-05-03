@@ -1,6 +1,6 @@
 import type express from 'express';
 import TaskService from './TaskService';
-
+import { isEmptyObject } from './utils/isEmptyObject';
 class TaskController {
   async create(req: express.Request, res: express.Response) {
     try {
@@ -23,8 +23,23 @@ class TaskController {
 
   async getAll(req: express.Request, res: express.Response) {
     try {
-      const tasks = await TaskService.getAll();
-      res.send(tasks);
+      if (isEmptyObject(req.query)) {
+        console.log(0);
+        const tasks = await TaskService.getAll();
+        console.log(tasks);
+        res.send(tasks);
+      } else {
+        console.log(req.query);
+        const page: number = req.query.page as any;
+        const limit: number = req.query.limit as any;
+        const { collectionLength, pageContent } = await TaskService.getPage(
+          page,
+          limit
+        );
+        res
+          .header('X-Total-Count', collectionLength?.toString())
+          .send(pageContent);
+      }
     } catch (e) {
       console.log(e);
     }
@@ -45,16 +60,6 @@ class TaskController {
       const { id } = req.params;
       const deletedTask = await TaskService.delete(id);
       res.send(deletedTask);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async getPage(req: express.Request, res: express.Response) {
-    try {
-      const page: number = +req.params.page;
-      const pageContent = await TaskService.getPage(page);
-      res.send(pageContent);
     } catch (e) {
       console.log(e);
     }

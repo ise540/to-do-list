@@ -3,8 +3,20 @@ import type TaskObject from './TaskObjectType';
 
 class TaskService {
   async create(task: TaskObject) {
-    const createdTask = await Task.create(task);
-    return createdTask;
+    const lastTask: any = (
+      await Task.find({}).sort({ $natural: -1 }).limit(1)
+    )[0];
+    if (!lastTask) {
+      const createdTask = await Task.create(task);
+      return createdTask;
+    } else {
+      task.neighbors.prev = lastTask._id.toString();
+      const createdTask = await Task.create(task);
+      lastTask.neighbors.next = createdTask._id.toString();
+      await this.update(lastTask);
+
+      return createdTask;
+    }
   }
 
   async getOne(id: string) {
@@ -33,25 +45,29 @@ class TaskService {
     return deletedTask;
   }
 
-  async getPage(page: number) {
-    if (isNaN(page) || page<1)
-        return { error: 'page must be a positive number' };
+  async getPage(page: number, limit: number) {
+    if (isNaN(page) || page < 1 || isNaN(limit) || limit < 1)
+      return { error: 'page and limit must be positive numbers' };
     const pageContent = await Task.find()
-      .skip((page - 1) * 5)
-      .limit(5);
-    return pageContent;
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const collection = await this.getAll();
+    const collectionLength = collection.length;
+    return { collectionLength, pageContent };
   }
 
   async getNext(id: string) {
-    const taskList = await Task.find();
-    const taskIndex = taskList.findIndex((item) => item._id == id);
-    return taskList[taskIndex + 1];
+    const currentTask = await Task.findById(id);
+    const nextTask = await Task.findById(currentTask.neighbors.next);
+
+    return nextTask;
   }
 
   async getPrevious(id: string) {
-    const taskList = await Task.find();
-    const taskIndex = taskList.findIndex((item) => item._id == id);
-    return taskList[taskIndex - 1];
+    const currentTask = await Task.findById(id);
+    const previousTask = await Task.findById(currentTask.neighbors.prev);
+
+    return previousTask;
   }
 }
 

@@ -9,9 +9,8 @@ router.get('/task/:id', TaskController.getOne);
 router.put('/update', TaskController.update);
 router.delete('/task/:id', TaskController.delete);
 
-router.get('/all', TaskController.getAll);
-router.get('/pages/:page', TaskController.getPage);
+router.get('/pages', TaskController.getAll);
 router.get('/task/:id/next', TaskController.getNext)
-router.get('/task/:id/previous', TaskController.getPrevious)
+router.get('/task/:id/prev', TaskController.getPrevious)
 
 export default router;
