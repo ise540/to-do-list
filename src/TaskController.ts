@@ -1,10 +1,10 @@
 import type express from 'express';
 import TaskService from './TaskService';
-import { isEmptyObject } from './utils/isEmptyObject';
 class TaskController {
   async create(req: express.Request, res: express.Response) {
     try {
       const task = await TaskService.create(req.body);
+      console.log(task);
       res.send(task);
     } catch (e) {
       res.status(400).json(e);
@@ -21,23 +21,32 @@ class TaskController {
     }
   }
 
-  async getAll(req: express.Request, res: express.Response) {
+  async getPagedTasks(req: express.Request, res: express.Response) {
     try {
-      if (isEmptyObject(req.query)) {
-        console.log(0);
+      console.log(req.query);
+      if (!req.query.page && !req.query.limit) {
+        console.log('all');
         const tasks = await TaskService.getAll();
-        console.log(tasks);
         res.send(tasks);
       } else {
-        console.log(req.query);
-        const page: number = req.query.page as any;
-        const limit: number = req.query.limit as any;
-        const { collectionLength, pageContent } = await TaskService.getPage(
+        let page: number = 1;
+
+        if (!isNaN(Number(req.query.page))) {
+          page = Number(req.query.page);
+        }
+
+        let limit: number = 10;
+
+        if (!isNaN(Number(req.query.limit))) {
+          limit = Number(req.query.limit);
+        }
+
+        const { collectionCount, pageContent } = await TaskService.getPage(
           page,
           limit
         );
         res
-          .header('X-Total-Count', collectionLength?.toString())
+          .header('X-Total-Count', collectionCount?.toString())
           .send(pageContent);
       }
     } catch (e) {
@@ -60,24 +69,6 @@ class TaskController {
       const { id } = req.params;
       const deletedTask = await TaskService.delete(id);
       res.send(deletedTask);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async getNext(req: express.Request, res: express.Response) {
-    try {
-      const nextTask = await TaskService.getNext(req.params.id);
-      res.send(nextTask);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async getPrevious(req: express.Request, res: express.Response) {
-    try {
-      const previousTask = await TaskService.getPrevious(req.params.id);
-      res.send(previousTask);
     } catch (e) {
       console.log(e);
     }

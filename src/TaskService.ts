@@ -1,18 +1,18 @@
 import Task from './Task';
-import type TaskObject from './TaskObjectType';
+import type { ITask } from './Task';
 
 class TaskService {
-  async create(task: TaskObject) {
-    const lastTask: any = (
+  async create(task: ITask) {
+    const lastTask: ITask = (
       await Task.find({}).sort({ $natural: -1 }).limit(1)
     )[0];
     if (!lastTask) {
       const createdTask = await Task.create(task);
       return createdTask;
     } else {
-      task.neighbors.prev = lastTask._id.toString();
+      task.neighbors.prev = lastTask._id;
       const createdTask = await Task.create(task);
-      lastTask.neighbors.next = createdTask._id.toString();
+      lastTask.neighbors.next = createdTask._id;
       await this.update(lastTask);
 
       return createdTask;
@@ -30,7 +30,7 @@ class TaskService {
     return tasks;
   }
 
-  async update(task: TaskObject) {
+  async update(task: Partial<ITask>) {
     if (!task._id) throw new Error(`No id provided`);
 
     const updatedTask = await Task.findByIdAndUpdate(task._id, task, {
@@ -46,28 +46,13 @@ class TaskService {
   }
 
   async getPage(page: number, limit: number) {
-    if (isNaN(page) || page < 1 || isNaN(limit) || limit < 1)
+    if (page < 1 || limit < 1)
       return { error: 'page and limit must be positive numbers' };
     const pageContent = await Task.find()
       .skip((page - 1) * limit)
       .limit(limit);
-    const collection = await this.getAll();
-    const collectionLength = collection.length;
-    return { collectionLength, pageContent };
-  }
-
-  async getNext(id: string) {
-    const currentTask = await Task.findById(id);
-    const nextTask = await Task.findById(currentTask.neighbors.next);
-
-    return nextTask;
-  }
-
-  async getPrevious(id: string) {
-    const currentTask = await Task.findById(id);
-    const previousTask = await Task.findById(currentTask.neighbors.prev);
-
-    return previousTask;
+    const collectionCount = await Task.count();
+    return { collectionCount, pageContent };
   }
 }
 

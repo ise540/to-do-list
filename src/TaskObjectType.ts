@@ -1,12 +1,14 @@
+import type mongoose from 'mongoose';
+
 type TaskObject = {
   readonly _id: string;
   number: number;
   title: string;
   description?: string;
-  status: boolean;
+  isDone: boolean;
   neighbors: {
-    next?: string;
-    prev?: string;
+    next?: mongoose.Types.ObjectId;
+    prev?: mongoose.Types.ObjectId;
   };
 };
 
